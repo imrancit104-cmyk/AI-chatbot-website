@@ -80,6 +80,111 @@ Response → [frontend/js/chat.js] ──> Display message in chat UI
 
 
 
+Prototype:
+
+
+1️⃣ [Homepage] — frontend/index.html
+   ├─ Shows: "Welcome to AI Chatbot", buttons: Signup, Login, Chat (disabled if not logged in)
+   ├─ CSS: style.css → layout, colors, buttons
+   └─ JS: none (static buttons link to pages)
+
+2️⃣ [Signup Page] — frontend/signup.html
+   ├─ Form Fields: name, email, password
+   ├─ JS: frontend/js/signup.js
+   │    ├─ Collect form data
+   │    ├─ POST request → /signup (backend/routes/authRoutes.js)
+   │    ├─ Receive response (success/error)
+   │    └─ Display message (alert or inline)
+   ├─ Connects with:
+   │    ├─ backend/routes/authRoutes.js → API endpoint
+   │    └─ backend/controllers/authController.js → Signup logic
+   └─ CSS: style.css → form styling
+
+3️⃣ [Login Page] — frontend/login.html
+   ├─ Form Fields: email, password
+   ├─ JS: frontend/js/login.js
+   │    ├─ Collect form data
+   │    ├─ POST request → /login
+   │    ├─ Receive JWT token
+   │    ├─ Save token → localStorage
+   │    └─ Redirect to chat.html on success
+   ├─ Connects with:
+   │    ├─ backend/routes/authRoutes.js
+   │    └─ backend/controllers/authController.js
+   └─ CSS: style.css
+
+4️⃣ [Chat Page] — frontend/chat.html
+   ├─ UI: Chat box, input field, send button
+   ├─ JS: frontend/js/chat.js
+   │    ├─ Collect message input
+   │    ├─ Read JWT token from localStorage
+   │    ├─ POST message → /ask (backend/routes/chatRoutes.js)
+   │    ├─ Receive AI response
+   │    └─ Update chat UI dynamically
+   ├─ Connects with:
+   │    ├─ backend/routes/chatRoutes.js
+   │    └─ backend/controllers/chatController.js
+   └─ CSS: style.css → chat styling
+
+5️⃣ [Backend: server.js]
+   ├─ Import Express
+   ├─ Initialize app, JSON parsing, CORS
+   ├─ Import routes:
+   │    ├─ authRoutes.js
+   │    └─ chatRoutes.js
+   ├─ Import DB connection → config/db.js
+   └─ Listen on port 5000 (or env.PORT)
+
+6️⃣ [Backend: config/db.js]
+   ├─ Connect to MongoDB Atlas using Mongoose
+   ├─ Export DB connection
+   └─ Used by server.js + controllers
+
+7️⃣ [Backend: models/User.js]
+   ├─ Fields: name, email, password, createdAt
+   ├─ Password hashed before save (bcrypt)
+   └─ Used by authController.js
+
+8️⃣ [Backend: routes/authRoutes.js]
+   ├─ POST /signup → authController.signup
+   ├─ POST /login → authController.login
+   └─ Export router → server.js
+
+9️⃣ [Backend: controllers/authController.js]
+   ├─ signup:
+   │    ├─ Check email exist
+   │    ├─ Hash password
+   │    ├─ Save user → DB
+   │    └─ Return success/error
+   ├─ login:
+   │    ├─ Verify email & password
+   │    ├─ Generate JWT token
+   │    └─ Return token + message
+   └─ Uses: User.js + db.js
+
+10️⃣ [Backend: middleware/authMiddleware.js]
+    ├─ Verify JWT token from request headers
+    ├─ If valid → allow request
+    └─ If invalid → return 401 Unauthorized
+
+11️⃣ [Backend: routes/chatRoutes.js]
+    ├─ POST /ask
+    ├─ Apply authMiddleware → secure route
+    └─ Calls chatController.askMessage
+
+12️⃣ [Backend: controllers/chatController.js]
+    ├─ Receive user message
+    ├─ Call OpenAI API
+    ├─ Receive AI response
+    └─ Return AI response to frontend
+
+
+
+
+API koi bhi use kar sakta ha like Grok, Deep seek or gemini.
+
+
+
 
 
 Abdul-Saboor:
